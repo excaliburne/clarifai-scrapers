@@ -32,21 +32,10 @@ class CCsearch:
 		self.specific_licenses = specific_licenses
 
 	
-	def run(self, keywords, output_name=None, return_formatted_dict=False, page_index=None):
+	def run(self, keywords, output_name):
 		all_data = []
 
 		queries = keywords.split(',')
-
-		if return_formatted_dict == True:
-			search_results = self.run_ccsearch(keywords, 
-											   self.license_type, 
-											   self.per_page, 
-											   self.search_limit,
-											   page_by_page=True,
-											   page_index=page_index)
-			all_data.extend(search_results)
-			json_data = self.return_formatted_dict(all_data)
-			return json_data
 
 		for query in tqdm(queries, desc='queries'):
 			search_results = self.run_ccsearch(query, self.license_type, self.per_page, self.search_limit)
@@ -63,7 +52,7 @@ class CCsearch:
 				"** Note: When uploading these to an app, do so at a slower rate than normal. They seem to timeout often."
 		)
 
-	def run_ccsearch(self, query, license_type, per_page, search_limit, page_by_page=False, page_index=None):
+	def run_ccsearch(self, query, license_type, per_page, search_limit):
 		'''
 		Input:
 			• query 				> search query
@@ -89,18 +78,17 @@ class CCsearch:
 
 		error_count = 0
 
-		if page_by_page:
-			search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_index}'
-			search_res = requests.request("GET", search_url)
+		search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_index}'
+		search_res = requests.request("GET", search_url)
 
-			if search_res.status_code == 200:
-				results = search_res.json()['results']
-				_ = [x.update({'search_query': query}) for x in results]
-				search_results.extend(results)
-			
-			search_results = list({v['id']: v for v in search_results}.values())
+		if search_res.status_code == 200:
+			results = search_res.json()['results']
+			_ = [x.update({'search_query': query}) for x in results]
+			search_results.extend(results)
+		
+		search_results = list({v['id']: v for v in search_results}.values())
 
-			return search_results
+		return search_results
 
 		for page_num in tqdm(range(0, int(np.ceil(result_count / per_page))), desc=f'results for {query}'):
 			search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_num}'
@@ -137,7 +125,6 @@ class CCsearch:
 					• creator, creator_url, id, license, license_version, source, title, search_query
 		'''
 
-		print(json.dumps(search_results, indent=2))
 		df_orig = pd.DataFrame(search_results)
 
 		# keep some of the columns as metadata
@@ -153,6 +140,14 @@ class CCsearch:
 		df_new = df_orig[['url', 'metadata']]
 
 		return df_new
+
+
+	def search(self, query, size, page_num):
+		search_one = f"http://api.creativecommons.engineering/v1/images/?q={query}&license_type={self.license_type}&page_size={size}&page={page_num}"
+		search_one_res = requests.get(search_one)
+		results = search_one_res.json()['results']
+
+		return self.return_formatted_dict(results)
 
 
 	def return_formatted_dict(self, search_results):
