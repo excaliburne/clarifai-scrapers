@@ -32,10 +32,21 @@ class CCsearch:
 		self.specific_licenses = specific_licenses
 
 	
-	def run(self, keywords, output_name, return_formatted_dict):
+	def run(self, keywords, output_name, return_formatted_dict, page_index=None):
 		all_data = []
 
 		queries = keywords.split(',')
+
+		if return_formatted_dict == True:
+			search_results = self.run_ccsearch(keywords, 
+											   self.license_type, 
+											   self.per_page, 
+											   self.search_limit,
+											   page_by_page=True,
+											   page_index=page_index)
+			all_data.extend(search_results)
+			json_data = self.return_formatted_dict(all_data)
+			return json_data
 
 		for query in tqdm(queries, desc='queries'):
 			search_results = self.run_ccsearch(query, self.license_type, self.per_page, self.search_limit)
@@ -43,9 +54,6 @@ class CCsearch:
 
 		if self.return_raw_data == True:
 			df = pd.DataFrame(all_data)
-		elif return_formatted_dict == True:
-			json_data = self.return_formatted_dict(all_data)
-			return json_data
 		else:
 			df = self.parse_ccsearch_into_upload_csv(all_data)
 
@@ -55,7 +63,7 @@ class CCsearch:
 				"** Note: When uploading these to an app, do so at a slower rate than normal. They seem to timeout often."
 		)
 
-	def run_ccsearch(self, query, license_type, per_page, search_limit):
+	def run_ccsearch(self, query, license_type, per_page, search_limit, page_by_page=False, page_index=None):
 		'''
 		Input:
 			• query 				> search query
@@ -80,6 +88,19 @@ class CCsearch:
 		search_results = []
 
 		error_count = 0
+
+		if page_by_page:
+			search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_index}'
+			search_res = requests.request("GET", search_url)
+
+			if search_res.status_code == 200:
+				results = search_res.json()['results']
+				_ = [x.update({'search_query': query}) for x in results]
+				search_results.extend(results)
+			
+			search_results = list({v['id']: v for v in search_results}.values())
+
+			return search_results
 
 		for page_num in tqdm(range(0, int(np.ceil(result_count / per_page))), desc=f'results for {query}'):
 			search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_num}'
