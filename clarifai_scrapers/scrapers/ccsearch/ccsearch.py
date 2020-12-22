@@ -32,7 +32,7 @@ class CCsearch:
 		self.specific_licenses = specific_licenses
 
 	
-	def run(self, keywords, output_name, return_formatted_dict, page_index=None):
+	def run(self, keywords, output_name=None, return_formatted_dict=False, page_index=None):
 		all_data = []
 
 		queries = keywords.split(',')
