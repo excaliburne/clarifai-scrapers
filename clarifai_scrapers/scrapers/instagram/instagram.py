@@ -3,23 +3,22 @@ import yaml
 
 import os 
 
-from instascrape import InstaScrape
-
 class InstagramScaper:
-    def __init__(self):
-        self.instagram = InstaScrape()
-        self.this_dir = os.path.dirname(os.path.realpath(__file__))
-        self.yml_path = self.this_dir + '/page_index.yml'
-        self.json_response = {
-            "total": 0,
-            "results": []
-        }
-        self.urls_arr = []
+    pass
+#     def __init__(self):
+#         self.instagram = InstaScrape()
+#         self.this_dir = os.path.dirname(os.path.realpath(__file__))
+#         self.yml_path = self.this_dir + '/page_index.yml'
+#         self.json_response = {
+#             "total": 0,
+#             "results": []
+#         }
+#         self.urls_arr = []
 
 
-    def get_post_from_tag(self, tag):
-        res = self.instagram.scrape_hashtag(tag)
-        return res
+#     def get_post_from_tag(self, tag):
+#         res = self.instagram.scrape_hashtag(tag)
+#         return res
 
 
 

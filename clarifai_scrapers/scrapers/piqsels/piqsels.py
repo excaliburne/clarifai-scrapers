@@ -34,14 +34,16 @@ class PiqselsScraper:
 
         for idx, li in enumerate(li_elements):
             if idx < per_page:
+                self.total += 1
                 a_tag = li.find('a')
                 href_link = a_tag['href']
-                self.total += 1
                 img = li.find('img')
                 thumb_img = img['data-src']
                 full_img = img['data-srcset'].split(' ')[1].split(',')[1]
+                img_id = href_link[-5:]
 
                 results_dict = {
+                    "id": img_id,
                     "alt_description": href_link,
                     "urls": {
                         "full": full_img,
