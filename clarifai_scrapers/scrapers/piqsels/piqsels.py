@@ -33,6 +33,7 @@ class PiqselsScraper:
         li_elements = self._get_image_grid()
 
         for idx, li in enumerate(li_elements):
+            print(idx)
             if idx < per_page:
                 self.total += 1
                 a_tag = li.find('a')
@@ -51,9 +52,9 @@ class PiqselsScraper:
                     }
                 }
 
-            self.json_response_template.update({'total': self.total})
-            self.json_response_template['results'].append(results_dict)
-        
+                self.json_response_template.update({'total': self.total})
+                self.json_response_template['results'].append(results_dict)
+            
         return self.json_response_template
 
 

@@ -9,7 +9,7 @@ import time
 def main():    
     scraper = PiqselsScraper()
 
-    data = scraper.scrape(query='plane', page_num=1, per_page=30)
+    data = scraper.scrape(query='stadium', page_num=1, per_page=30)
     print(json.dumps(data, indent=2))
    
 
