@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from .endpoints import SEARCH
 
-class PisqelsScraper:
+class PiqselsScraper:
     def __init__(self):
         self.total = 0
         self.json_response_template = {
