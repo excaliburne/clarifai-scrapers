@@ -78,34 +78,28 @@ class CCsearch:
 
 		error_count = 0
 
-		search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_index}'
-		search_res = requests.request("GET", search_url)
+		try:
+			for page_num in tqdm(range(0, int(np.ceil(result_count / per_page))), desc=f'results for {query}'):
+				search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_num}'
+				search_res = requests.request("GET", search_url)
 
-		if search_res.status_code == 200:
-			results = search_res.json()['results']
-			_ = [x.update({'search_query': query}) for x in results]
-			search_results.extend(results)
-		
-		search_results = list({v['id']: v for v in search_results}.values())
-
-		return search_results
-
-		for page_num in tqdm(range(0, int(np.ceil(result_count / per_page))), desc=f'results for {query}'):
-			search_url = f'{base_url}q={query}&license_type={license_type}&page_size={per_page}&page={page_num}'
-			search_res = requests.request("GET", search_url)
-
-			if search_res.status_code == 200:
-				results = search_res.json()['results']
-				_ = [x.update({'search_query': query}) for x in results]
-				search_results.extend(results)
-			else:
-				if error_count < 3:
-					error_count += 1
-					time.sleep(1)
-					continue
+				if search_res.status_code == 200:
+					results = search_res.json()['results']
+					_ = [x.update({'search_query': query}) for x in results]
+					search_results.extend(results)
 				else:
-					print(f"There's been frequent errors with this search. Stopping with current query [{query}].")
+					if error_count < 3:
+						error_count += 1
+						time.sleep(1)
+						continue
+					else:
+						print(
+							f"There's been frequent errors with this search. Stopping with current query [{query}]."
+						)
 					return search_results
+
+		except ZeroDivisionError:
+			print(f"This query [{query}] resulted in zero results. skipping the query")
 
 		# below used to filter out duplicate entries
 		search_results = list({v['id']: v for v in search_results}.values())
