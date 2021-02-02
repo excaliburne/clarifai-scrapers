@@ -7,5 +7,5 @@ setup(
     description="Clarifai Scrapers",
     author='Jeremy',
     author_email='',
-    url='https://github.com/theatlantic/django-nested-admin'
+    url='https://github.com/excaliburne/clarifai-scrapers'
 )
