@@ -136,5 +136,5 @@ class Reddit:
             returned_dict['results'].append(template)
             returned_dict['total'] = returned_dict['total'] + 1
 
-        return json.dumps(returned_dict, indent=4)
+        return returned_dict
 
