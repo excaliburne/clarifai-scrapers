@@ -1,5 +1,8 @@
+beautifulsoup4==4.9.3
+bs4==0.0.1
 certifi==2020.12.5
 chardet==4.0.0
+-e git+https://4bca0e9aace904709dadc5fe16f25d6eade3669b@github.com/excaliburne/clarifai-scrapers.git@d750443977cfdda2ac4039c13f5495de5d00b091#egg=clarifai_scrapers
 idna==2.10
 numpy==1.19.4
 pandas==1.1.5
@@ -7,5 +10,6 @@ python-dateutil==2.8.1
 pytz==2020.4
 requests==2.25.1
 six==1.15.0
+soupsieve==2.2
 tqdm==4.54.1
-urllib3==1.26.2
+urllib3==1.26.3

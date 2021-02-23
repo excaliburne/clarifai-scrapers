@@ -1,17 +1,14 @@
-from clarifai_scrapers import CCsearch, PiqselsScraper, Pixabay
+from clarifai_scrapers import CCsearch, PiqselsScraper, Pixabay, Reddit
 
-import json
-import requests
-
-import time
-
+import json, time
 
 def main():    
-    scraper = Pixabay('19656232-d9688ba6bdcd8dd2414f9e132')
-    data = scraper.scrape_toolbox_format(query='sky', page_num=3, per_page=30)
-
-    print(json.dumps(data, indent=2))
-   
+    scraper = Reddit(
+        subreddit='pics'
+    )
+    print(scraper.search_images(per_page=30, page=1))
+    print(scraper.search_images(per_page=30, page=2))
+    print(scraper.search_images(per_page=30, page=3))
 
 if __name__ == "__main__":
     main()
