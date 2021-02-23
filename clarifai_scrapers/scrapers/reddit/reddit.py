@@ -19,7 +19,7 @@ RATE_LIMIT = 1 / (RATE_LIMIT_PER_MINUTE / 60)
 class Reddit:
     pushshift_meta = 'https://api.pushshift.io/meta'
 
-    def __init__(self, subreddit, output_file=None):
+    def __init__(self):
         self.last_utc = None
         self.current_page = 1
     
