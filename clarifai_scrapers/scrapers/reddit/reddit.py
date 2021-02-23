@@ -20,16 +20,14 @@ class Reddit:
     pushshift_meta = 'https://api.pushshift.io/meta'
 
     def __init__(self, subreddit, output_file=None):
-        self.subreddit = subreddit
-        self.output_file = output_file
         self.last_utc = None
         self.current_page = 1
     
-    def run_scraper(self, page_limit=100):
+    def run_scraper(self, subreddit, output_file, per_page=100):
         all_data = []
         prev_last_utc = 'placeholder'
 
-        pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={self.subreddit}&size={page_limit}'
+        pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}'
 
         # get first page of results
         data, cur_last_utc = self.get_images(pushshift_url)
@@ -50,7 +48,7 @@ class Reddit:
                 prev_last_utc = cur_last_utc
 
                 # build new pushshift url and get images
-                pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={self.subreddit}&size={page_limit}&before={prev_last_utc}'
+                pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}&before={prev_last_utc}'
                 data, cur_last_utc = self.get_images(pushshift_url)
                 all_data.extend(data)
 
@@ -66,7 +64,7 @@ class Reddit:
 
         df = pd.DataFrame(all_data)
         df.to_csv(self.output_file, index=False)
-        print(f'Results saved to output file: {self.output_file}')
+        print(f'Results saved to output file: {output_file}')
 
     
     def get_images(self, pushshift_url, sparse_meta=False):
@@ -103,8 +101,8 @@ class Reddit:
         return data, last_utc
     
 
-    def search_images(self, per_page, page):
-        pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={self.subreddit}&size={per_page}'
+    def search_images(self, subreddit, per_page, page):
+        pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}'
 
         if page == 1:
             self.last_utc = None
