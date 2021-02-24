@@ -7,6 +7,10 @@ import time
 import requests
 import pandas as pd
 
+# UTILS
+from clarifai_scrapers.utils.reddit import filter_metadata
+from clarifai_scrapers.utils.write import write_data_to_csv
+
 
 PUSHSHIFT_META = 'https://api.pushshift.io/meta'
 RATE_LIMIT_PER_MINUTE = requests.request(
@@ -22,24 +26,48 @@ class Reddit:
     def __init__(self):
         self.last_utc = None
         self.current_page = 1
+        self.all_data = []
     
-    def run_scraper(self, subreddit, output_file, per_page=100):
-        all_data = []
+    def run_scraper(
+        self, 
+        subreddit: str, 
+        output_file: str = None, 
+        per_page: int = 100, 
+        limit: int = 100):
+
         prev_last_utc = 'placeholder'
+
+        if limit <= 100:
+            per_page = limit
 
         pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}'
 
         # get first page of results
         data, cur_last_utc = self.get_images(pushshift_url)
-        all_data.extend(data)
+        self.all_data.extend(data)
+
+        if limit <= 100:
+            self.all_data = self.all_data[:limit]
+
+            if len(self.all_data) < limit:
+                prev_last_utc = cur_last_utc
+                pushshift_url = pushshift_url + f'&before={prev_last_utc}'
+                self.all_data.extend(data)
+            
+            filtered_data = filter_metadata(self.all_data[:limit])
+
+            if output_file == None:
+                return filtered_data
+            else:
+                write_data_to_csv(filtered_data, output_file)
 
         print(
             'Note: If you need to stop the script, hit `ctrl + c` once, which will write out any results and safely exit.'
         )
-        print('total collected items: {}'.format(len(all_data)))
+        print('total collected items: {}'.format(len(self.all_data)))
 
         # begin while loop, using the cur_last_id to paginate through results
-        while prev_last_utc != cur_last_utc:
+        while prev_last_utc != cur_last_utc and len(self.all_data) < limit:
             try:
                 # trying to respect PushShift's api limit
                 time.sleep(RATE_LIMIT)
@@ -50,9 +78,9 @@ class Reddit:
                 # build new pushshift url and get images
                 pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}&before={prev_last_utc}'
                 data, cur_last_utc = self.get_images(pushshift_url)
-                all_data.extend(data)
+                self.all_data.extend(data)
 
-                print('total collected items: {}'.format(len(all_data)))
+                print('total collected items: {}'.format(len(self.all_data)))
 
                 if cur_last_utc == None:
                     break
@@ -61,12 +89,16 @@ class Reddit:
             except KeyboardInterrupt:
                 print("Manual keyboard interrupt detected. Attempting to save current results and exit.")
                 break
+        
+        self.all_data = self.all_data[:limit]
+        filtered_data = filter_metadata(self.all_data)
 
-        df = pd.DataFrame(all_data)
-        df.to_csv(self.output_file, index=False)
-        print(f'Results saved to output file: {output_file}')
+        if output_file == None:
+            return filtered_data
+        else:
+            write_data_to_csv(filtered_data, output_file)
 
-    
+
     def get_images(self, pushshift_url, sparse_meta=False):
         data = []
         last_utc = None
@@ -92,7 +124,7 @@ class Reddit:
 
                 temp_dict = {}
                 temp_dict['url'] = item_url
-                temp_dict['metadata'] = json.dumps(metadata_dict)
+                temp_dict['metadata'] = metadata_dict
 
                 data.append(temp_dict)
                 
@@ -119,7 +151,7 @@ class Reddit:
         }
 
         for item in data:
-            metadata_to_dict = json.loads(item['metadata'])
+            metadata_to_dict = item['metadata']
             image_id = metadata_to_dict['id']
             image_thumb = metadata_to_dict['thumbnail']
             image_description = metadata_to_dict['title']

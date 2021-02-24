@@ -4,7 +4,11 @@ import json, time
 
 def main():    
     scraper = Reddit()
-    print(scraper.search_images(subreddit='pics', per_page=30, page=1))
+    print(scraper.run_scraper(
+        subreddit='pics',
+        limit=4
+        # output_file='~/Downloads/reddit5.csv'
+    ))
 
 if __name__ == "__main__":
     main()
