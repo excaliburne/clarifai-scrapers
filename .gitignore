@@ -142,3 +142,4 @@ dmypy.json
 # PERSONAL
 results*.txt
 outputs.txt
+output.txt
