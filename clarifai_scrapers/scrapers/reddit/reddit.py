@@ -63,7 +63,7 @@ class Reddit:
 
             if output_file == None:
                 filtered_data = format_concepts(filtered_data)
-                return json.dumps(filtered_data, indent=4)
+                return filtered_data
             else:
                 write_data_to_csv(filtered_data, output_file)
 
