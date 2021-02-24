@@ -14,3 +14,11 @@ def filter_metadata(all_data):
         item['metadata'] = filtered_meta
     
     return all_data
+
+
+def format_concepts(all_data):
+    for item in all_data:
+        item['concepts'] = []
+        item.pop('not concepts', None)
+    
+    return all_data

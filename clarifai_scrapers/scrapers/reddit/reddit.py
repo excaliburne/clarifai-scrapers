@@ -8,7 +8,7 @@ import requests
 import pandas as pd
 
 # UTILS
-from clarifai_scrapers.utils.reddit import filter_metadata
+from clarifai_scrapers.utils.reddit import filter_metadata, format_concepts
 from clarifai_scrapers.utils.write import write_data_to_csv
 
 
@@ -62,7 +62,8 @@ class Reddit:
             filtered_data = filter_metadata(self.all_data[:limit])
 
             if output_file == None:
-                return filtered_data
+                filtered_data = format_concepts(filtered_data)
+                return json.dumps(filtered_data, indent=4)
             else:
                 write_data_to_csv(filtered_data, output_file)
 
