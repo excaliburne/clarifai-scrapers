@@ -100,6 +100,7 @@ class Reddit:
         filtered_data = filter_metadata(self.all_data)
 
         if output_file == None:
+            filtered_data = format_concepts(filtered_data)
             return filtered_data
         else:
             write_data_to_csv(filtered_data, output_file)

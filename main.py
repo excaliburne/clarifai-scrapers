@@ -6,7 +6,7 @@ def main():
     scraper = Reddit()
     print(scraper.run_scraper(
         subreddit='pics',
-        limit=40
+        limit=110
     ))
 
 if __name__ == "__main__":
