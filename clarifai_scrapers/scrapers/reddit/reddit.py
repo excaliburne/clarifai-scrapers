@@ -35,25 +35,30 @@ class Reddit:
         per_page: int = 100, 
         limit: int = 100):
 
-        prev_last_utc = 'placeholder'
-
+        # if limit is under 100 we only want to page argument as limit
         if limit <= 100:
             per_page = limit
 
+        # base pushfit url
         pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}'
 
-        # get first page of results
+        # get first page of results and join the new data to existing if any
         data, cur_last_utc = self.get_images(pushshift_url)
         self.all_data.extend(data)
 
         if limit <= 100:
+            # we grab all the items until 'limit'
             self.all_data = self.all_data[:limit]
 
+            # if the length of data if less than the limit wanted, make another request
+            # and merge to the data array
             if len(self.all_data) < limit:
-                prev_last_utc = cur_last_utc
-                pushshift_url = pushshift_url + f'&before={prev_last_utc}'
+                self.last_utc = cur_last_utc
+                pushshift_url = pushshift_url + f'&before={self.last_utc}'
                 self.all_data.extend(data)
             
+            # we filter the wanted metadata and we do another slicing until 'limit
+            # at this point we should have the exact number of items wished under 100
             filtered_data = filter_metadata(self.all_data[:limit])
 
             if output_file == None:
@@ -67,16 +72,16 @@ class Reddit:
         print('total collected items: {}'.format(len(self.all_data)))
 
         # begin while loop, using the cur_last_id to paginate through results
-        while prev_last_utc != cur_last_utc and len(self.all_data) < limit:
+        while self.last_utc != cur_last_utc and len(self.all_data) < limit:
             try:
                 # trying to respect PushShift's api limit
                 time.sleep(RATE_LIMIT)
 
                 # set cur_last_id as new prev_last_id
-                prev_last_utc = cur_last_utc
+                self.last_utc = cur_last_utc
 
                 # build new pushshift url and get images
-                pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}&before={prev_last_utc}'
+                pushshift_url = f'https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&size={per_page}&before={self.last_utc}'
                 data, cur_last_utc = self.get_images(pushshift_url)
                 self.all_data.extend(data)
 
@@ -99,10 +104,15 @@ class Reddit:
             write_data_to_csv(filtered_data, output_file)
 
 
-    def get_images(self, pushshift_url, sparse_meta=False):
+    def get_images(
+        self, 
+        pushshift_url: str, 
+        sparse_meta=False):
+        
         data = []
         last_utc = None
 
+        print('debug', pushshift_url)
         res = requests.request('GET', pushshift_url)
         res_data = res.json()['data']
 

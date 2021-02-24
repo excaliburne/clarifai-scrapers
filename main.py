@@ -6,8 +6,8 @@ def main():
     scraper = Reddit()
     print(scraper.run_scraper(
         subreddit='pics',
-        limit=4
-        # output_file='~/Downloads/reddit5.csv'
+        limit=240,
+        output_file='~/Downloads/reddit5.csv'
     ))
 
 if __name__ == "__main__":
