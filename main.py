@@ -3,19 +3,9 @@ from clarifai_scrapers import CCsearch, PiqselsScraper, Pixabay, Reddit, Instagr
 import json, time
 
 def main():    
-    scraper = InstagramScraper()
+    scraper = Reddit()
 
-    print(
-        json.dumps(
-            scraper.search_media_by_hashtag('motogp', count=30, page=1), 
-        indent=4)
-    )
-    print('--------------' * 3)
-    print(
-        json.dumps(
-            scraper.search_media_by_hashtag('motogp', count=30, page=2), 
-        indent=4)
-    )
+    print(json.dumps(scraper.run_scraper(subreddit='pics', limit=20), indent=4))
     
 
 if __name__ == "__main__":
