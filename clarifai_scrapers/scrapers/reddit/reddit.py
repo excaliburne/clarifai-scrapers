@@ -67,9 +67,6 @@ class Reddit:
         #     else:
         #         write_data_to_csv(filtered_data, output_file)
 
-        print(
-            'Note: If you need to stop the script, hit `ctrl + c` once, which will write out any results and safely exit.'
-        )
         print('total collected items: {}'.format(len(self.all_data)))
 
         # begin while loop, using the cur_last_id to paginate through results
