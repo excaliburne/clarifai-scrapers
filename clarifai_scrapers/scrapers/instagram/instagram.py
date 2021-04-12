@@ -1,4 +1,8 @@
+# PACKAGES
 from igramscraper.instagram import Instagram
+
+# UTILS
+from clarifai_scrapers.utils.instagram import convert_to_scrape_format
 
 instagram = Instagram()
 
@@ -14,7 +18,13 @@ class InstagramScraper:
         }
 
 
-    def search_media_by_hashtag(self, hashtag, page_num, per_page):
+    def search_media_by_hashtag(
+        self, 
+        hashtag, 
+        page_num, 
+        per_page
+        ):
+
         if page_num == 1:
             self.last_id = None
 
@@ -54,5 +64,31 @@ class InstagramScraper:
         return returned_dict
 
 
-    def scrape(self):
-        pass
+    def scrape(
+        self,
+        hashtag,
+        count=30,
+        output_file=None
+        ):
+
+        results = []
+        decount = count
+        current_page = 1
+
+        if count <= 30 and output_file == None:
+            current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=1, per_page=count)['results']
+            results.extend(convert_to_scrape_format(current_result))
+        else:
+            while decount != 0:
+                if decount >= 30:
+                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=30)
+                    decount -= 30
+                else:
+                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=decount)
+                    decount = 0
+
+                current_page += 1
+                results.extend(convert_to_scrape_format(current_result))
+
+        if output_file == None:
+            return results
