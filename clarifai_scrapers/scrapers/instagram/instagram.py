@@ -14,14 +14,14 @@ class InstagramScraper:
         }
 
 
-    def search_media_by_hashtag(self, hashtag, count, page):
-        if page == 1:
+    def search_media_by_hashtag(self, hashtag, page_num, per_page):
+        if page_num == 1:
             self.last_id = None
 
         if self.last_id == None: 
-            medias = instagram.get_medias_by_tag(hashtag, count=count)
+            medias = instagram.get_medias_by_tag(hashtag, count=per_page)
         else:
-            medias = instagram.get_medias_by_tag(hashtag, count=count, max_id=self.last_id)
+            medias = instagram.get_medias_by_tag(hashtag, count=per_page, max_id=self.last_id)
 
         returned_dict = {
             'total': 0,
@@ -52,6 +52,7 @@ class InstagramScraper:
 
         self.last_id = returned_dict['results'][-1]['id']
         return returned_dict
+
 
     def scrape(self):
         pass

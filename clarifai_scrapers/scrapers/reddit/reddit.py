@@ -46,27 +46,6 @@ class Reddit:
         data, cur_last_utc = self.get_images(pushshift_url)
         self.all_data.extend(data)
 
-        # if limit <= 100:
-        #     # we grab all the items until 'limit'
-        #     self.all_data = self.all_data[:limit]
-
-        #     # if the length of data if less than the limit wanted, make another request
-        #     # and merge to the data array
-        #     if len(self.all_data) < limit:
-        #         self.last_utc = cur_last_utc
-        #         pushshift_url = pushshift_url + f'&before={self.last_utc}'
-        #         self.all_data.extend(data)
-            
-        #     # we filter the wanted metadata and we do another slicing until 'limit
-        #     # at this point we should have the exact number of items wished under 100
-        #     filtered_data = filter_metadata(self.all_data[:limit])
-
-        #     if output_file == None:
-        #         filtered_data = format_concepts(filtered_data)
-        #         return filtered_data
-        #     else:
-        #         write_data_to_csv(filtered_data, output_file)
-
         print('total collected items: {}'.format(len(self.all_data)))
 
         # begin while loop, using the cur_last_id to paginate through results
