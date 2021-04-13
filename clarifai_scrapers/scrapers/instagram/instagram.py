@@ -81,10 +81,10 @@ class InstagramScraper:
         else:
             while decount != 0:
                 if decount >= 30:
-                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=30)
+                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=30)['results']
                     decount -= 30
                 else:
-                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=decount)
+                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=decount)['results']
                     decount = 0
 
                 current_page += 1
