@@ -3,6 +3,7 @@ from igramscraper.instagram import Instagram
 
 # UTILS
 from clarifai_scrapers.utils.instagram import convert_to_scrape_format
+from clarifai_scrapers.utils.write import write_data_to_csv
 
 instagram = Instagram()
 
@@ -66,9 +67,9 @@ class InstagramScraper:
 
     def scrape(
         self,
-        hashtag,
-        count=30,
-        output_file=None
+        hashtag: str,
+        count: int = 30,
+        output_file: str = None
         ):
 
         results = []
@@ -92,3 +93,5 @@ class InstagramScraper:
 
         if output_file == None:
             return results
+        else:
+            write_data_to_csv(results, output_file)

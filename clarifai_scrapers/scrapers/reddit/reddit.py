@@ -28,12 +28,14 @@ class Reddit:
         self.current_page = 1
         self.all_data = []
     
+
     def run_scraper(
         self, 
         subreddit: str, 
         output_file: str = None, 
         per_page: int = 100, 
-        limit: int = 100):
+        limit: int = 100
+        ):
 
         # if limit is under 100 we only want to page argument as limit
         if limit <= 100:
