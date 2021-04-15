@@ -94,6 +94,8 @@ class InstagramScraper:
         if output_file == None:
             return results
         else:
+            formatted_rows = []
             for row in results:
                 row['not concepts'] = []
-            write_data_to_csv(results, output_file)
+                formatted_rows.append(row)
+            write_data_to_csv(formatted_rows, output_file)
