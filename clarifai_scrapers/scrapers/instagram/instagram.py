@@ -4,6 +4,7 @@ from igramscraper.instagram import Instagram
 # UTILS
 from clarifai_scrapers.utils.instagram import convert_to_scrape_format
 from clarifai_scrapers.utils.write import write_data_to_csv
+from clarifai_scrapers.utils import images
 
 instagram = Instagram()
 
@@ -44,8 +45,8 @@ class InstagramScraper:
 
             metadata = self._filter_metadata(media_to_dict)
             image_id = media_to_dict['identifier']
-            image_thumb = media_to_dict['square_images'][0]
-            image_url = media_to_dict['image_high_resolution_url']
+            image_thumb = images.get_as_base64(media_to_dict['square_images'][0])
+            image_url = images.get_as_base64(media_to_dict['image_high_resolution_url'])
             image_description = media_to_dict['caption']
 
             template = {
