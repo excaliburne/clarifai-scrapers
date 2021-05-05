@@ -46,15 +46,17 @@ class InstagramScraper:
             metadata = self._filter_metadata(media_to_dict)
             image_id = media_to_dict['identifier']
             image_thumb = images.get_as_base64(media_to_dict['square_images'][0])
-            image_url = images.get_as_base64(media_to_dict['image_high_resolution_url'])
+            image_bytes = images.get_as_base64(media_to_dict['image_high_resolution_url'])
+            image_url = media_to_dict['image_high_resolution_url']
             image_description = media_to_dict['caption']
 
             template = {
                 'id': image_id,
 				'alt_description': image_description,
 				'urls': {
-					'full': image_url,
-					'thumb': image_thumb
+					'full': image_bytes,
+					'thumb': image_thumb,
+                    'url': image_url
 				},
                 'metadata': metadata
             }
