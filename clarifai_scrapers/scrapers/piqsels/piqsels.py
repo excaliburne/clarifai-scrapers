@@ -1,8 +1,10 @@
-import requests
-import json
+# SYSTEM IMPORTS
+import requests, json
 
+# PACKAGES
 from bs4 import BeautifulSoup
 
+# THIS MODULE
 from .endpoints import SEARCH
 
 class PiqselsScraper:
@@ -15,17 +17,20 @@ class PiqselsScraper:
         self.page_num = 1
         self.query = ''
 
+
     def _start_bs4_machine(self):
         page = requests.get(SEARCH(self.query, page_num=self.page_num))
         soup = BeautifulSoup(page.content, 'html.parser')
         return soup
     
+
     def _get_image_grid(self):
         soup = self._start_bs4_machine()
         results = soup.find(id='flow')
         li_elements = results.find_all('li')
         return li_elements
         
+
     def scrape(self, query, page_num, per_page):
         self.page_num = page_num
         self.query = query
@@ -33,7 +38,6 @@ class PiqselsScraper:
         li_elements = self._get_image_grid()
 
         for idx, li in enumerate(li_elements):
-            print(idx)
             if idx < per_page:
                 self.total += 1
                 a_tag = li.find('a')

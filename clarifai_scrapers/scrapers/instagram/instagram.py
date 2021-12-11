@@ -6,11 +6,14 @@ from clarifai_scrapers.utils.instagram import convert_to_scrape_format
 from clarifai_scrapers.utils.write import write_data_to_csv
 from clarifai_scrapers.utils import images
 
+
 instagram = Instagram()
+
 
 class InstagramScraper:
     def __init__(self):
         self.last_id = None
+            
             
     def _filter_metadata(self, media_dict: dict):
         return {

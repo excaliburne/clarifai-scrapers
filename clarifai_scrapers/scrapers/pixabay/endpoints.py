@@ -1,4 +1,3 @@
 
 
-SEARCH_PHOTO = lambda key, query, page, per_page: \
-f'https://pixabay.com/api/?key={key}&q={query}&image_type=photo&page={page}&per_page={per_page}'
+PIXABAY__GET = 'https://pixabay.com/api/?key={api_key}&q={query}&image_type=photo&page={page_num}&per_page={per_page}'

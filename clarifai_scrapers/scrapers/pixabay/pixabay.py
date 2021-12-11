@@ -1,62 +1,90 @@
+# SYSTEM 
 import requests
-import urllib
 
-from .endpoints import SEARCH_PHOTO
+# UTILS
+from .endpoints import PIXABAY__GET
+from clarifai_scrapers.utils.url_handler import UrlHandler
+from clarifai_scrapers.utils.decorators import timed
 
+# MODULES
+from clarifai_scrapers.scrapers.base import ScraperBase
 
-class Pixabay:
-    def __init__(self, api_key):
+class Pixabay(ScraperBase):
+
+    def __init__(self, api_key: str):
+        super().__init__()
+
         self.api_key = api_key
+
         self.query = ''
         self.page_num = 1
         self.per_page = 30
 
-        self.json_response_template = {
-            "total": 0,
-            "results": []
+
+    def _make_request(self):
+        params = {
+            'api_key': self.api_key,
+            'query': self.query,
+            'page_num': self.page_num,
+            'per_page': self.per_page
         }
 
-    def make_request(self):
-        req = requests.get(SEARCH_PHOTO(self.api_key, self.query, self.page_num, self.per_page)).json()
-        return req
+        url = UrlHandler().build(PIXABAY__GET, params)
+        req = requests.get(url)
+
+        return req.json()
     
+
+    def _template_search(self, pixabay_image_object: dict):
+        template = {
+            "id": pixabay_image_object.get('id'),
+            "alt_description": pixabay_image_object.get('pageURL'),
+            "urls": {
+                "full": pixabay_image_object.get('largeImageURL'),
+                "thumb": pixabay_image_object.get('previewURL')
+            }
+        }
+
+        return template
+
+
     def scrape(self, query, page_num, per_page):
-        self.query = query
-        self.page_num = page_num
-        self.per_page = per_page
+        pass
+        # self.query = query
+        # self.page_num = page_num
+        # self.per_page = per_page
 
-        return self.make_request()
+        # return self._make_request()
 
-    def scrape_toolbox_format(self, query, page_num, per_page):
-        self.query = query
-        self.page_num = page_num
-        self.per_page = per_page
 
-        response = self.make_request()
-        results = response.get('hits')
-        total = 0
+    @timed
+    def search(
+        self, 
+        query: str, 
+        page_num: int, 
+        per_page: int,
+        **additional_data: dict
+        ):
+        """
+        Query images from Pixabay API
 
-        for idx, image in enumerate(results):
-            if idx < self.per_page:
-                total += 1
-                img_id = image.get('id')
-                img_thumb = image.get('previewURL')
-                img_full = image.get('largeImageURL')
-                alt_description = image.get('pageURL')
+        Args:
+            query (str):
+            page_num (int): 
+            per_page (int): 
 
-                results_dict = {
-                    "id": img_id,
-                    "alt_description": alt_description,
-                    "urls": {
-                        "full": img_full,
-                        "thumb": img_thumb
-                    }
-                }
+        Returns:
+            dict: { "total": 0, "results": [] }
+        """
+        for param in list(locals().items())[1:]:
+            setattr(self, param[0], param[1])
 
-                self.json_response_template['results'].append(results_dict)
-                self.json_response_template.update({ 'total': total })
-            
-        return self.json_response_template
+        pixabay_response = self._make_request()
+        pixabay_results = pixabay_response.get('hits', [])
+
+        results = [self._template_search(image) for image in pixabay_results]
+
+        return self._response.search(results, additional_data)
 
 
 
