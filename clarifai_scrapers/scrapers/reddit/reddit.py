@@ -27,7 +27,7 @@ class Reddit(ScraperBase):
         # self.current_page = 1
         # self.all_data = []
 
-        self.submissions = RedditSubmissions(self)
+        self.submissions = RedditSubmissions()
     
 
     def run_scraper(
@@ -85,12 +85,12 @@ class Reddit(ScraperBase):
         #     write_data_to_csv(filtered_data, output_file)
 
     
-class RedditSubmissions:
+class RedditSubmissions(ScraperBase):
 
-    def __init__(self, parent):
-
-        for key, value in parent.__dict__.items():
-            setattr(self, key, value)
+    def __init__(self):
+        super().__init__()
+        # for key, value in parent.__dict__.items():
+        #     setattr(self, key, value)
 
         self.subreddit = ''
         self.per_page = 30
