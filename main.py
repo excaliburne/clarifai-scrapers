@@ -1,6 +1,11 @@
-from clarifai_scrapers import CCsearch, PiqselsScraper, Pixabay, Reddit, InstagramScraper
+from clarifai_scrapers import (
+    CCsearch, PiqselsScraper, 
+    Pixabay, Reddit, 
+    InstagramScraper
+)
 
 import json, time
+
 
 def main():    
     scraper = Pixabay('19656232-d9688ba6bdcd8dd2414f9e132')
