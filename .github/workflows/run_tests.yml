@@ -25,8 +25,8 @@ jobs:
       - name: Setup env
         env:
           API_KEY_PIXABAY: ${{ secrets.API_KEY_PIXABAY }}
-      #   shell: bash
-      #   run: |
-      #     export PYTHONPATH=.
-      #     pip3 install pytest
-      #     pytest tests/ -v -n auto
+        shell: bash
+        run: |
+          export PYTHONPATH=.
+          pip3 install pytest
+          pytest tests/ -v -n auto
