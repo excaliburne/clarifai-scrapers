@@ -11,8 +11,6 @@ class HttpClient:
     def make_request(self, method, endpoint, body=None):
         args = {}
         req = getattr(requests, method)
-
-        # args['headers'] = {'Authorization': f'Key {self.token}'}
         
         if method == 'post':
             args['headers'] = {**args['headers'], 'Content-Type': 'application/json'}
@@ -22,4 +20,4 @@ class HttpClient:
         
         r = req(endpoint, **args)
 
-        return r.json()
+        return r

@@ -1,5 +1,5 @@
 from clarifai_scrapers import (
-    CCsearch, PiqselsScraper, 
+    CCsearch, Piqsels, 
     Pixabay, Reddit, 
     InstagramScraper
 )
@@ -8,9 +8,11 @@ import json, time
 
 
 def main():    
-    scraper = Reddit()
+    scraper = Piqsels()
 
-    print(json.dumps(scraper.submissions.search(subreddit="pics", per_page=30, page_num=1), indent=4))
+    data = scraper.search(query="grass", page_num=1, per_page=30)
+
+    print(data)
     
 
 if __name__ == "__main__":

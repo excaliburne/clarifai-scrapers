@@ -1,3 +1,6 @@
+from clarifai_scrapers.scrapers.reddit.endpoints import BASE_URL
 
 
-PIXABAY__GET = 'https://pixabay.com/api/?key={api_key}&q={query}&image_type=photo&page={page_num}&per_page={per_page}'
+BASE_URL = 'https://pixabay.com/api/'
+
+SEARCH_IMAGES_URL = BASE_URL + '?key={api_key}&q={query}&image_type=photo&page={page_num}&per_page={per_page}'

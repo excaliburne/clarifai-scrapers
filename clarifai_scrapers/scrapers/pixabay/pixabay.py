@@ -2,21 +2,24 @@
 import requests
 
 # UTILS
-from .endpoints import PIXABAY__GET
 from clarifai_scrapers.utils.url_handler import UrlHandler
 from clarifai_scrapers.utils.decorators import timed
 
 # MODULES
 from clarifai_scrapers.scrapers.base import ScraperBase
 
+# CONSTS
+from .endpoints import SEARCH_IMAGES_URL
+
+
 class Pixabay(ScraperBase):
 
     def __init__(self, api_key: str):
         super().__init__()
 
-        self.api_key = api_key
+        self.api_key  = api_key
 
-        self.query = ''
+        self.query    = ''
         self.page_num = 1
         self.per_page = 30
 
@@ -29,10 +32,10 @@ class Pixabay(ScraperBase):
             'per_page': self.per_page
         }
 
-        url = UrlHandler().build(PIXABAY__GET, params)
-        req = requests.get(url)
+        url      = self._url_handler.build(SEARCH_IMAGES_URL, params)
+        response = self._http_client('get', url).json()
 
-        return req.json()
+        return response
     
 
     def _template_search(self, pixabay_image_object: dict):
@@ -80,9 +83,8 @@ class Pixabay(ScraperBase):
             setattr(self, param[0], param[1])
 
         pixabay_response = self._make_request()
-        pixabay_results = pixabay_response.get('hits', [])
-
-        results = [self._template_search(image) for image in pixabay_results]
+        pixabay_results  = pixabay_response.get('hits', [])
+        results          = [self._template_search(image) for image in pixabay_results]
 
         return self._response.search(results, additional_data)
 
