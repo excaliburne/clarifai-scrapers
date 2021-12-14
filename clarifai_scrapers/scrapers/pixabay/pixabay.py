@@ -33,7 +33,7 @@ class Pixabay(ScraperBase):
         }
 
         url      = self._url_handler.build(SEARCH_IMAGES_URL, params)
-        response = self._http_client('get', url).json()
+        response = self._http_client.make_request('get', url).json()
 
         return response
     
