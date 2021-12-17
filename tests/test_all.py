@@ -17,6 +17,11 @@ def _get_scrapers() -> list:
 
     scrapers = [
         {
+            'name': 'ccsearch',
+            'init': CCsearch(),
+            'search_attribute': 'search'
+        },
+        {
             'name': 'reddit',
             'init': Reddit().submissions,
             'search_attribute': 'search'
