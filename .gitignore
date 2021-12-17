@@ -143,5 +143,6 @@ dmypy.json
 results*.txt
 outputs.txt
 output.txt
+test.csv
 
 .vscode/
