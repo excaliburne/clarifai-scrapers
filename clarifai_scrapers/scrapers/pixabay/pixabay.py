@@ -38,7 +38,8 @@ class Pixabay(ScraperBase):
         return response
     
 
-    def _template_search(self, pixabay_image_object: dict):
+    @staticmethod
+    def _template_search(pixabay_image_object: dict):
         template = {
             "id": pixabay_image_object.get('id'),
             "alt_description": pixabay_image_object.get('pageURL'),
@@ -53,11 +54,6 @@ class Pixabay(ScraperBase):
 
     def scrape(self, query, page_num, per_page):
         pass
-        # self.query = query
-        # self.page_num = page_num
-        # self.per_page = per_page
-
-        # return self._make_request()
 
 
     @timed
@@ -86,7 +82,7 @@ class Pixabay(ScraperBase):
         pixabay_results  = pixabay_response.get('hits', [])
         results          = [self._template_search(image) for image in pixabay_results]
 
-        return self._response.search(results, additional_data)
+        return self._response.search(results=results, additional_data=additional_data)
 
 
 

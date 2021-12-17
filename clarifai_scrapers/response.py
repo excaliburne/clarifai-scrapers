@@ -1,4 +1,5 @@
-
+# UTILS
+from clarifai_scrapers.utils.decorators import add_all_args_to_self
 
 class Response:
     """
@@ -18,8 +19,8 @@ class SearchResults:
         self.additional_data = {}
 
 
-    def __call__(self, *args):
-        return self.returns(*args)
+    def __call__(self, **kwargs):
+        return self.returns(**kwargs)
 
     
     def _template(self):
@@ -30,12 +31,11 @@ class SearchResults:
         }
     
     
+    @add_all_args_to_self
     def returns(
         self,
         results: list, 
         additional_data: dict = {}
         ):
-        for param in list(locals().items())[1:]:
-            setattr(self, param[0], param[1])
-
+        
         return self._template()

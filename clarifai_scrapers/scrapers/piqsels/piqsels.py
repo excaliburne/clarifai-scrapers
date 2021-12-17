@@ -1,6 +1,3 @@
-# SYSTEM IMPORTS
-import requests
-
 # MODULES
 from clarifai_scrapers.scrapers.base import ScraperBase
 
@@ -83,12 +80,14 @@ class Piqsels(ScraperBase):
         return template
 
 
+    # TODO: Need to find a better workaround for the pagination
     @add_all_args_to_self
     @timed
     def search(
         self, 
         query: str, 
-        page_num: int, 
+        page_num: int,
+        per_page: int,
         **additional_data
         ):
         """
@@ -97,16 +96,16 @@ class Piqsels(ScraperBase):
         Args:
             query (str)
             page_num (int)
+            per_page (int)
 
         Returns:
             (dict): Response dict
         """
 
         list_elements = self._get_image_grid()
-        results       = [self._template_search(list_element) for list_element in list_elements]
-
+        results       = [self._template_search(list_element) for list_element in list_elements[:per_page]]
             
-        return self._response.search(results, additional_data)
+        return self._response.search(results=results, additional_data=additional_data)
 
 
 

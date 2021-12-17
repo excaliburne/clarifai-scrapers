@@ -93,7 +93,7 @@ class RedditSubmissions(ScraperBase):
     @reset_last_utc
     def search(
         self, 
-        subreddit: str, 
+        query: str, 
         per_page: int, 
         page_num: int,
         **additional_data: dict
@@ -102,7 +102,7 @@ class RedditSubmissions(ScraperBase):
         Search for submmitted images/videos in given subreddit
 
         Args:
-            subreddit (str)
+            query (str): Subreddit
             per_page (int)
             page_num (int)
 
@@ -113,14 +113,14 @@ class RedditSubmissions(ScraperBase):
         pushshift_response = self._make_request()['data']
         results            = [self._template_search(submission) for submission in pushshift_response]
 
-        return self._response.search(results, additional_data)
+        return self._response.search(results=results, additional_data=additional_data)
     
 
     @add_all_args_to_self
     @paginate(30)
     def scrape(
         self, 
-        subreddit: str, 
+        query: str, 
         limit: int = 100,
         output_file_path: str = None, 
         **additional_data
@@ -129,7 +129,7 @@ class RedditSubmissions(ScraperBase):
         Scrape submissions given a subreddit
 
         Args:
-            subreddit (str): 
+            query (str): Subreddit
             limit (int, optional): Number of inputs you want to generate. Defaults to 100.
             output_file_path (str, optional): Output file path for creating .csv
             **additional_data (dict): Args returned by decorators

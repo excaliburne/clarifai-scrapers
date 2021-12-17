@@ -1,5 +1,6 @@
 # SYSTEM IMPORTS
-import requests, json
+import requests
+import json
 
 
 class HttpClient:

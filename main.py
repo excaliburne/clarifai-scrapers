@@ -1,3 +1,4 @@
+from igramscraper.instagram import Instagram
 from clarifai_scrapers import (
     CCsearch, Piqsels, 
     Pixabay, Reddit, 
@@ -8,9 +9,9 @@ import json, time
 
 
 def main():    
-    scraper = Piqsels()
+    scraper = CCsearch()
 
-    data = scraper.search(query="grass", page_num=1, per_page=30)
+    data = scraper.search(query="grass", page_num=1, per_page=25)
 
     print(data)
     

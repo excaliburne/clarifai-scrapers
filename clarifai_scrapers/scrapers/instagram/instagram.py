@@ -1,21 +1,35 @@
 # PACKAGES
 from igramscraper.instagram import Instagram
 
+# MODULES
+from clarifai_scrapers.scrapers.base import ScraperBase
+
+# THIS SCRAPER
+from .decorators import reset_last_id
+
 # UTILS
-from clarifai_scrapers.utils.instagram import convert_to_scrape_format
-from clarifai_scrapers.utils.write import write_data_to_csv
-from clarifai_scrapers.utils import images
+# from clarifai_scrapers.utils.instagram import convert_to_scrape_format
+# from clarifai_scrapers.utils.write import write_data_to_csv
+# from clarifai_scrapers.utils import images
+from clarifai_scrapers.utils.decorators import add_all_args_to_self, timed
 
 
 instagram = Instagram()
 
 
-class InstagramScraper:
+class InstagramScraper(ScraperBase):
+
     def __init__(self):
+        super().__init__()
+        
         self.last_id = None
+        self.query = ''
+        self.per_page = 30
+        self.page_num = 1
             
-            
-    def _filter_metadata(self, media_dict: dict):
+    
+    @staticmethod
+    def _filter_metadata(media_dict: dict) -> dict:
         return {
             'type': media_dict['type'],
             'square_images': media_dict['square_images'],
@@ -23,85 +37,89 @@ class InstagramScraper:
         }
 
 
+    def _make_request(self):
+        req = instagram.get_medias_by_tag
+        args = {'count': self.per_page}
+
+        if self.last_id is not None:
+            args['max_id'] = self.last_id
+        
+        return req(self.query, **args)
+
+
+    def _template_search(self, media: dict) -> dict:
+        media_to_dict = media.__dict__
+
+        image_url = media_to_dict['image_high_resolution_url']
+        metadata = self._filter_metadata(media_to_dict)
+        image_id = media_to_dict['identifier']
+        image_thumb = media_to_dict['square_images'][0]
+        image_bytes = image_url
+        image_description = media_to_dict['caption']
+
+        template = {
+            'id': image_id,
+            'alt_description': image_description,
+            'urls': {
+                'full': image_bytes,
+                'thumb': image_thumb,
+                'url': image_url
+            },
+            'metadata': metadata
+        }
+        
+        return template
+
+
+    @timed
+    @reset_last_id
+    @add_all_args_to_self
     def search_media_by_hashtag(
         self, 
-        hashtag, 
+        query, 
         page_num, 
-        per_page
-        ):
+        per_page,
+        **additional_data
+        ) -> dict:
 
-        if page_num == 1:
-            self.last_id = None
+        results      = self._make_request()
+        response     = [self._template_search(media) for media in results]
+        self.last_id = response[-1]['id']
 
-        if self.last_id == None: 
-            medias = instagram.get_medias_by_tag(hashtag, count=per_page)
-        else:
-            medias = instagram.get_medias_by_tag(hashtag, count=per_page, max_id=self.last_id)
-
-        returned_dict = {
-            'total': 0,
-            'results': []
-        }
-
-        for media in medias:
-            media_to_dict = media.__dict__
-
-            metadata = self._filter_metadata(media_to_dict)
-            image_id = media_to_dict['identifier']
-            image_thumb = images.get_as_base64(media_to_dict['square_images'][0])
-            image_bytes = images.get_as_base64(media_to_dict['image_high_resolution_url'])
-            image_url = media_to_dict['image_high_resolution_url']
-            image_description = media_to_dict['caption']
-
-            template = {
-                'id': image_id,
-				'alt_description': image_description,
-				'urls': {
-					'full': image_bytes,
-					'thumb': image_thumb,
-                    'url': image_url
-				},
-                'metadata': metadata
-            }
-
-            returned_dict['results'].append(template)
-            returned_dict['total'] = returned_dict['total'] + 1
-
-        self.last_id = returned_dict['results'][-1]['id']
-        return returned_dict
+        return self._response.search(results=response, additional_data=additional_data)
 
 
-    def scrape(
-        self,
-        hashtag: str,
-        count: int = 30,
-        output_file: str = None
-        ):
+    # def scrape(
+    #     self,
+    #     hashtag: str,
+    #     count: int = 30,
+    #     output_file: str = None
+    #     ):
 
-        results = []
-        decount = count
-        current_page = 1
+    #     results = []
+    #     decount = count
+    #     current_page = 1
 
-        if count <= 30 and output_file == None:
-            current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=1, per_page=count)['results']
-            results.extend(convert_to_scrape_format(current_result))
-        else:
-            while decount != 0:
-                if decount >= 30:
-                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=30)['results']
-                    decount -= 30
-                else:
-                    current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=decount)['results']
-                    decount = 0
+    #     if count <= 30 and output_file == None:
+    #         current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=1, per_page=count)['results']
+    #         results.extend(convert_to_scrape_format(current_result))
+    #     else:
+    #         while decount != 0:
+    #             if decount >= 30:
+    #                 current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=30)['results']
+    #                 decount -= 30
+    #             else:
+    #                 current_result = self.search_media_by_hashtag(hashtag=hashtag, page_num=current_page, per_page=decount)['results']
+    #                 decount = 0
 
-                current_page += 1
-                results.extend(convert_to_scrape_format(current_result))
+    #             current_page += 1
+    #             results.extend(convert_to_scrape_format(current_result))
 
-        if output_file == None:
-            return results
-        else:
-            formatted_rows = []
-            for row in results:
-                row['not concepts'] = []
-                formatted_rows.append(row)
-            write_data_to_csv(formatted_rows, output_file)
+    #     if output_file == None:
+    #         return results
+    #     else:
+    #         formatted_rows = []
+    #         for row in results:
+    #             row['not concepts'] = []
+    #             formatted_rows.append(row)
+    #         write_data_to_csv(formatted_rows, output_file)
