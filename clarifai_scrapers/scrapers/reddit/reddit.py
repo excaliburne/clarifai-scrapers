@@ -37,7 +37,7 @@ class RedditSubmissions(ScraperBase):
     def __init__(self):
         super().__init__()
 
-        self.subreddit = ''
+        self.query = ''
         self.per_page  = 30
         self.page_num  = 1
         self.last_utc  = None
@@ -75,12 +75,13 @@ class RedditSubmissions(ScraperBase):
     @timed
     def _make_request(self, **kwargs) -> list:
         params = {
-            'subreddit': self.subreddit,
+            'subreddit': self.query,
             'per_page': self.per_page,
             'other_params': '' if not self.last_utc else f'&before={self.last_utc}'
         }
 
         url      = self._url_handler.build(SEARCH_SUBMISSIONS_IN_SUBREDDIT_URL, params)
+        print(111, url)
         response = self._http_client.make_request('get', url).json()
 
         self.last_utc = response['data'][-1]['created_utc']

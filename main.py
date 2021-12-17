@@ -9,9 +9,9 @@ import json, time
 
 
 def main():    
-    scraper = CCsearch()
+    scraper = Reddit()
 
-    data = scraper.search(query="grass", page_num=1, per_page=25)
+    data = scraper.submissions.search(query="forsen", page_num=1, per_page=25)
 
     print(data)
     
