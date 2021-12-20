@@ -45,7 +45,7 @@ class RedditSubmissions(ScraperBase):
     
     def __call__(self):
         pass
-
+    
 
     @staticmethod
     def _template_search(submission_object: dict) -> dict:
@@ -80,13 +80,22 @@ class RedditSubmissions(ScraperBase):
             'other_params': '' if not self.last_utc else f'&before={self.last_utc}'
         }
 
-        url      = self._url_handler.build(SEARCH_SUBMISSIONS_IN_SUBREDDIT_URL, params)
-        print(111, url)
-        response = self._http_client.make_request('get', url).json()
-
-        self.last_utc = response['data'][-1]['created_utc']
+        url           = self._url_handler.build(SEARCH_SUBMISSIONS_IN_SUBREDDIT_URL, params)
+        response      = self._http_client.make_request('get', url).json()
+        self.update_last_utc(response)
 
         return response
+
+
+    def update_last_utc(self, response: dict) -> None:
+        last_utc = None
+
+        try:
+            last_utc = response['data'][-1]['created_utc']
+        except IndexError:
+            last_utc = None
+        
+        self.last_utc = last_utc
 
 
     @add_all_args_to_self

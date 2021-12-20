@@ -58,10 +58,15 @@ def test_all_search_sanity_check():
     for scraper in _get_scrapers():
         req     = getattr(scraper['init'], scraper['search_attribute'])
         results = req(query="stadium", page_num=1, per_page=per_page)['results']
+
+        if scraper['name'] != 'reddit': 
+            assert len(results) > 0
+            assert len(results) == per_page
     
-        assert len(results) > 0
-        assert len(results) == per_page
-    
+    reddit_res = Reddit().submissions.search(query="pics", page_num=1, per_page=per_page)['results']
+    assert len(reddit_res) > 0
+    assert len(reddit_res) == per_page
+
 
 def test_all_search_templates_format():
     """
@@ -72,9 +77,8 @@ def test_all_search_templates_format():
     per_page = 5
 
     for scraper in _get_scrapers():
-        req     = getattr(scraper['init'], scraper['search_attribute'])
-        results = req(query="stadium", page_num=1, per_page=per_page)['results']
-
+        req                 = getattr(scraper['init'], scraper['search_attribute'])
+        results             = req(query="stadium", page_num=1, per_page=per_page)['results']
         dict_keys_should_be = ['id', 'alt_description', 'urls']
 
         for key in dict_keys_should_be:
