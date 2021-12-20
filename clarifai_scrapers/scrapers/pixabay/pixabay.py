@@ -1,9 +1,5 @@
-# SYSTEM 
-import requests
-
 # UTILS
-from clarifai_scrapers.utils.url_handler import UrlHandler
-from clarifai_scrapers.utils.decorators import timed
+from clarifai_scrapers.utils.decorators import timed, add_all_args_to_self
 
 # MODULES
 from clarifai_scrapers.scrapers.base import ScraperBase
@@ -55,7 +51,8 @@ class Pixabay(ScraperBase):
     def scrape(self, query, page_num, per_page):
         pass
 
-
+    
+    @add_all_args_to_self
     @timed
     def search(
         self, 
@@ -75,8 +72,6 @@ class Pixabay(ScraperBase):
         Returns:
             dict: { "total": 0, "results": [] }
         """
-        for param in list(locals().items())[1:]:
-            setattr(self, param[0], param[1])
 
         pixabay_response = self._make_request()
         pixabay_results  = pixabay_response.get('hits', [])
