@@ -26,11 +26,11 @@ def _get_scrapers() -> list:
             'init': Reddit().submissions,
             'search_attribute': 'search'
         },
-        {
-            'name': 'instagram',
-            'init': InstagramScraper(),
-            'search_attribute': 'search_media_by_hashtag'
-        }, 
+        # {
+        #     'name': 'instagram',
+        #     'init': InstagramScraper(),
+        #     'search_attribute': 'search_media_by_hashtag'
+        # }, 
         {
             'name': 'pixabay',
             'init': Pixabay(Config().get('API_KEY_PIXABAY')),
