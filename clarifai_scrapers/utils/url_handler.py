@@ -1,4 +1,3 @@
-
 # UTILS
 from clarifai_scrapers.utils.dicts import delete_none_values
 
@@ -15,20 +14,20 @@ class UrlHandler:
         data = None
         ) -> str:
         """
-        Build a string for requested endpoint and feeds ids to pre-formatted strin
+        Build a string for requested endpoint and feeds ids to pre-formatted string
 
         Args:
             endpoint_name (str)
             data (dict, optional): Url ids should be passed in a dict like {'user_id': 'xyz'}. Defaults to None.
 
         Returns:
-            str: [description]
+            (str): Url
         """
 
         url = endpoint
 
         if (data):
             data = delete_none_values(data)
-            url = getattr(url, 'format')(**data)
+            url  = getattr(url, 'format')(**data)
 
         return url
