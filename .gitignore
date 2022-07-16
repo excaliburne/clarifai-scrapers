@@ -144,5 +144,4 @@ results*.txt
 outputs.txt
 output.txt
 test.csv
-
-.vscode/
+main_private.py

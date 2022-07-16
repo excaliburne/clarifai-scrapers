@@ -1,6 +1,5 @@
 # SYSTEM IMPORTS
-import requests
-import json
+import requests, json
 
 
 class HttpClient:
@@ -9,12 +8,23 @@ class HttpClient:
         pass
 
 
-    def make_request(self, method, endpoint, body=None):
-        args = {}
-        req = getattr(requests, method)
+    def make_request(
+        self, 
+        method: str, 
+        endpoint: str, 
+        body: dict = None,
+        additionalHeaders: dict = {}
+        ):
+
+        method = method.lower()
+        args   = {'headers': {**additionalHeaders}}
+        req    = getattr(requests, method)
         
         if method == 'post':
-            args['headers'] = {**args['headers'], 'Content-Type': 'application/json'}
+            args['headers'] = {
+                **args['headers'], 
+                'Content-Type': 'application/json'
+            }
 
         if body: 
             args['data'] = json.dumps(body)

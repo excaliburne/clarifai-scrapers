@@ -1,41 +1,30 @@
-# UTILS
-from clarifai_scrapers.utils.decorators import add_all_args_to_self
+# SYSTEM IMPORTS 
+import json, inspect
+
+
+class Wrapper:
+    def __init__(self, response):
+
+        self.response      = response 
+        self.response_type = type(response)
+    
+
+    def __call__(self):
+        stack             = inspect.stack()
+        get_method_called = str(stack[3].code_context).split(' ')[-1].split('.')[-1].split('()')[0]
+
+        if 'to_json' in get_method_called:
+            return self
+        else:
+            return self.response
+
+
+    def to_json(self, pretty_print: bool = False):
+
+        return json.dumps(self.response, **{'indent': 2} if pretty_print else {})
 
 class Response:
-    """
-    Package response object entry point
-    """
+  
+    def returns(self, response: dict):
 
-    def __init__(self):
-        self.search = SearchResults()
-
-
-class SearchResults:
-    """
-    Specifically focuses on returning search results
-    """
-    def __init__(self):
-        self.results = []
-        self.additional_data = {}
-
-
-    def __call__(self, **kwargs):
-        return self.returns(**kwargs)
-
-    
-    def _template(self):
-        return {
-            'total': len(list(self.results)),
-            'results': self.results,
-            **self.additional_data
-        }
-    
-    
-    @add_all_args_to_self
-    def returns(
-        self,
-        results: list, 
-        additional_data: dict = {}
-        ):
-        
-        return self._template()
+        return Wrapper(response)()

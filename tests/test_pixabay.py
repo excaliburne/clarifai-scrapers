@@ -1,4 +1,3 @@
-from os import scandir
 from clarifai_scrapers import Pixabay
 
 # ROOT

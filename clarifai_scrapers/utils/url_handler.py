@@ -11,23 +11,35 @@ class UrlHandler:
     def build(
         cls, 
         endpoint: str,
-        data = None
+        path_variables: dict = None,
+        query_params: dict = None
         ) -> str:
         """
         Build a string for requested endpoint and feeds ids to pre-formatted string
 
         Args:
-            endpoint_name (str)
-            data (dict, optional): Url ids should be passed in a dict like {'user_id': 'xyz'}. Defaults to None.
+            endpoint (str)
+            path_variables (dict, optional): Url ids should be passed in a dict like {'user_id': 'xyz'}. Defaults to None.
+            query_params (dict, optional)
 
         Returns:
-            (str): Url
+            (String)
         """
 
-        url = endpoint
+        url               = endpoint
+        query_params_list = []
 
-        if (data):
-            data = delete_none_values(data)
-            url  = getattr(url, 'format')(**data)
-
-        return url
+        if (path_variables):
+            url = getattr(endpoint, 'format')(**delete_none_values(path_variables))
+        
+        if query_params:
+            for idx, query_param in enumerate(query_params.items()):
+                if query_param[1] is not None:
+                    if idx == 0:
+                        query = f'?{query_param[0]}={query_param[1]}'
+                    else:
+                        query = f'&{query_param[0]}={query_param[1]}'
+                    
+                    query_params_list.append(query)
+                
+        return url + ''.join(query_params_list)

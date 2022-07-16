@@ -29,7 +29,7 @@ class Piqsels(ScraperBase):
             'page_num': self.page_num
         }
 
-        url      = self._url_handler.build(SEARCH_URL, params)
+        url      = self._url_handler.build(SEARCH_URL, path_variables=params)
         response = self._http_client.make_request('get', url)
         soup     = BeautifulSoup(response.content, 'html.parser')
 

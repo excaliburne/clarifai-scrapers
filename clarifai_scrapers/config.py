@@ -10,6 +10,5 @@ class Config:
     def __init__(self):
         self._env = load_dotenv(find_dotenv())
     
-
-    def get(self, key):
+    def get(self, key: str) -> str:
         return os.environ.get(key)
