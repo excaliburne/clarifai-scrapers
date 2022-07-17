@@ -7,18 +7,17 @@ class Wrapper:
 
         self.response      = response 
         self.response_type = type(response)
-    
 
+
+    # this is very hack-y and will have to update it at some point
     def __call__(self):
-        return self.response
-        
+        stack             = inspect.stack()
+        get_method_called = str(stack[3].code_context).split(' ')[-1].split('.')[-1].split('()')[0]
 
-    def __getattribute__(self, attribute_name):
-        return super().__getattribute__(attribute_name)
-
-
-    def get_response(self):
-        return self.response
+        if 'to_json' in get_method_called:
+            return self
+        else:
+            return self.response
 
 
     def to_json(self, pretty_print: bool = False):
