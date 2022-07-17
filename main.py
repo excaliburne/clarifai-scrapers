@@ -1,11 +1,8 @@
-from igramscraper.instagram import Instagram
 from clarifai_scrapers import (
     CCsearch, Piqsels, 
     Pixabay, Reddit, 
     InstagramScraper
 )
-
-import json, time
 
 
 def main():    

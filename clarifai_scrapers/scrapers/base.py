@@ -6,6 +6,6 @@ from clarifai_scrapers.http_client import HttpClient
 class ScraperBase:
 
     def __init__(self):
-        self._response = Response()
+        self._response    = Response()
         self._url_handler = UrlHandler()
         self._http_client = HttpClient()

@@ -10,18 +10,21 @@ class Wrapper:
     
 
     def __call__(self):
-        stack             = inspect.stack()
-        get_method_called = str(stack[3].code_context).split(' ')[-1].split('.')[-1].split('()')[0]
+        return self.response
+        
 
-        if 'to_json' in get_method_called:
-            return self
-        else:
-            return self.response
+    def __getattribute__(self, attribute_name):
+        return super().__getattribute__(attribute_name)
+
+
+    def get_response(self):
+        return self.response
 
 
     def to_json(self, pretty_print: bool = False):
 
         return json.dumps(self.response, **{'indent': 2} if pretty_print else {})
+
 
 class Response:
   
