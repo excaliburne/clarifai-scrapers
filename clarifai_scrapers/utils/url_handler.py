@@ -41,5 +41,5 @@ class UrlHandler:
                         query = f'&{query_param[0]}={query_param[1]}'
                     
                     query_params_list.append(query)
-                
+
         return url + ''.join(query_params_list)

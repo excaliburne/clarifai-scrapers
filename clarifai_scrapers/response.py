@@ -3,30 +3,25 @@ import json, inspect
 
 
 class Wrapper:
-    def __init__(self, response):
 
+    def __init__(self, response):
         self.response      = response 
         self.response_type = type(response)
 
 
-    # this is very hack-y and will have to update it at some point
-    def __call__(self):
-        stack             = inspect.stack()
-        get_method_called = str(stack[3].code_context).split(' ')[-1].split('.')[-1].split('()')[0]
-
-        if 'to_json' in get_method_called:
-            return self
-        else:
-            return self.response
+    def get_data(self) -> dict or list:
+        return self.response
 
 
-    def to_json(self, pretty_print: bool = False):
-
+    def to_json(self, pretty_print: bool = False) -> json:
         return json.dumps(self.response, **{'indent': 2} if pretty_print else {})
 
 
 class Response:
-  
-    def returns(self, response: dict):
 
-        return Wrapper(response)()
+    def __init__(self):
+        pass 
+
+
+    def returns(self, response: dict):
+        return Wrapper(response)

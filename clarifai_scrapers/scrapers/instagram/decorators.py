@@ -1,6 +1,5 @@
 # SYSTEM
 from functools import wraps
-from operator import itemgetter
 
 
 def reset_last_id(fn):
@@ -8,9 +7,9 @@ def reset_last_id(fn):
     @wraps(fn)
     def inner(self, *args, **kwargs):
 
-        page_num = itemgetter('page_num')(kwargs)
+        page = kwargs.get('page') or 1
 
-        if page_num == 1: self.last_utc = None
+        if page == 1: self.last_utc = None
 
         return fn(self, *args, **kwargs)
     

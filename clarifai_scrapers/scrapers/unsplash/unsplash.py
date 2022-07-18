@@ -1,4 +1,5 @@
 # MODULES
+from clarifai_scrapers import response
 from clarifai_scrapers.scrapers.base import ScraperBase
 
 # 
@@ -37,6 +38,19 @@ class Unsplash(ScraperBase):
         return response
     
 
+    def _to_response_schema(self, unsplash_image_object):
+        response_schema = {
+            'id': unsplash_image_object.get('id'),
+            'alt_description': unsplash_image_object.get('alt_description'),
+            'urls': {
+                'full': unsplash_image_object['urls']['full'],
+                'thumb': unsplash_image_object['urls']['thumb']
+            }
+        }
+
+        return response_schema
+
+
     def list_photos(
         self,
         page: int = None,
@@ -55,7 +69,7 @@ class Unsplash(ScraperBase):
                 - popular
 
         Returns:
-            (str<json> or dict)
+            (str<json> or list<dict>)
         """
         response = self._make_request(
             LIST_PHOTOS, 
@@ -66,8 +80,11 @@ class Unsplash(ScraperBase):
                 'order_by': order_by
             }
         )
-    
-        return Response().returns(response.json())
+
+        response_schema = [self._to_response_schema(image_object) for image_object in response.json()] \
+            if response.status_code == 200 else []
+
+        return Response().returns(response_schema)
     
 
     def search_photos(
@@ -111,7 +128,7 @@ class Unsplash(ScraperBase):
                 - squarish
 
         Returns:
-            (str<json> or dict)
+            (str<json> or list<dict>)
         """
 
         response = self._make_request(
@@ -127,5 +144,8 @@ class Unsplash(ScraperBase):
                 'orientation': orientation
             }
         )
-    
-        return Response().returns(response.json())
+
+        to_response_schema = [self._to_response_schema(image_object) for image_object in response.json()['results']] \
+            if response.status_code == 200 else []
+
+        return self._response.returns(to_response_schema)

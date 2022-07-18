@@ -1,3 +1,8 @@
+"""
+NOT WORKING ANYMORE. PLEASE DON'T USE ANYMORE UNTIL FIXED :(
+
+"""
+
 # PACKAGES
 from igramscraper.instagram import Instagram
 
@@ -8,26 +13,35 @@ from clarifai_scrapers.scrapers.base import ScraperBase
 from .decorators import reset_last_id
 
 # UTILS
-# from clarifai_scrapers.utils.instagram import convert_to_scrape_format
-# from clarifai_scrapers.utils.write import write_data_to_csv
-# from clarifai_scrapers.utils import images
 from clarifai_scrapers.utils.decorators import add_all_args_to_self, timed
-
-
-instagram = Instagram()
 
 
 class InstagramScraper(ScraperBase):
 
-    def __init__(self):
+    def __init__(
+        self,
+        user_data: dict = None
+        ):
+        """
+
+        Args:
+            user_data (dict, optional): Should look like... 
+                {'username': '', 'password': ''}
+        """
         super().__init__()
         
         self.last_id = None
         self.query = ''
         self.per_page = 30
-        self.page_num = 1
-            
-    
+        self.page = 1
+
+        self.instagram = Instagram()
+
+        if user_data:
+            self.instagram.with_credentials(*user_data.values())
+            self.instagram.login()     
+
+
     @staticmethod
     def _filter_metadata(media_dict: dict) -> dict:
         return {
@@ -38,7 +52,7 @@ class InstagramScraper(ScraperBase):
 
 
     def _make_request(self):
-        req = instagram.get_medias_by_tag
+        req  = self.instagram.get_medias_by_tag
         args = {'count': self.per_page}
 
         if self.last_id is not None:
@@ -50,11 +64,11 @@ class InstagramScraper(ScraperBase):
     def _template_search(self, media: dict) -> dict:
         media_to_dict = media.__dict__
 
-        image_url = media_to_dict['image_high_resolution_url']
-        metadata = self._filter_metadata(media_to_dict)
-        image_id = media_to_dict['identifier']
-        image_thumb = media_to_dict['square_images'][0]
-        image_bytes = image_url
+        image_url         = media_to_dict['image_high_resolution_url']
+        metadata          = self._filter_metadata(media_to_dict)
+        image_id          = media_to_dict['identifier']
+        image_thumb       = media_to_dict['square_images'][0]
+        image_bytes       = image_url
         image_description = media_to_dict['caption']
 
         template = {
@@ -76,17 +90,16 @@ class InstagramScraper(ScraperBase):
     @add_all_args_to_self
     def search_media_by_hashtag(
         self, 
-        query, 
-        page_num, 
-        per_page,
-        **additional_data
+        query: str, 
+        page: int = 1, 
+        per_page: int = 30
         ) -> dict:
 
         results      = self._make_request()
         response     = [self._template_search(media) for media in results]
         self.last_id = response[-1]['id']
 
-        return self._response.search(results=response, additional_data=additional_data)
+        return self._response.returns(results)
 
 
     # def scrape(

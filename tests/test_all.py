@@ -5,7 +5,7 @@ Non module specific tests
 from clarifai_scrapers import (
     CCsearch, Reddit,
     InstagramScraper, Pixabay,
-    Piqsels
+    Piqsels, Unsplash
 )
 
 # UTILS
@@ -18,7 +18,7 @@ def _get_scrapers() -> list:
     scrapers = [
         {
             'name': 'ccsearch',
-            'init': CCsearch(),
+            'init': CCsearch({'client_id': Config().get('CLIENT_ID_CCSEARCH'), 'client_secret': Config().get('CLIENT_SECRET_CCSEARCH')}),
             'search_attribute': 'search'
         },
         {
@@ -40,7 +40,12 @@ def _get_scrapers() -> list:
             'name': 'piqsels',
             'init': Piqsels(),
             'search_attribute': 'search'
-        }
+        },
+         {
+            'name': 'unsplash',
+            'init': Unsplash(Config().get('API_KEY_UNSPLASH')),
+            'search_attribute': 'search_photos'
+        },
     ]
 
     return scrapers
@@ -50,20 +55,20 @@ def _get_scrapers() -> list:
 def test_all_search_sanity_check():
     """
     Checks if...
-        - All modules returns results that are not None and correspond to requests page size
+        - All modules returns results that != None and correspond to requested page size
     """
 
     per_page = 25
 
     for scraper in _get_scrapers():
         req     = getattr(scraper['init'], scraper['search_attribute'])
-        results = req(query="stadium", page_num=1, per_page=per_page)['results']
+        results = req(query="stadium", page=1, per_page=per_page).get_data()
 
         if scraper['name'] != 'reddit': 
             assert len(results) > 0
             assert len(results) == per_page
     
-    reddit_res = Reddit().submissions.search(query="pics", page_num=1, per_page=per_page)['results']
+    reddit_res = Reddit().submissions.search(query="pics", page=1, per_page=per_page).get_data()
     assert len(reddit_res) > 0
     assert len(reddit_res) == per_page
 
@@ -78,7 +83,7 @@ def test_all_search_templates_format():
 
     for scraper in _get_scrapers():
         req                 = getattr(scraper['init'], scraper['search_attribute'])
-        results             = req(query="stadium", page_num=1, per_page=per_page)['results']
+        results             = req(query="stadium", page=1, per_page=per_page).get_data()
         dict_keys_should_be = ['id', 'alt_description', 'urls']
 
         for key in dict_keys_should_be:

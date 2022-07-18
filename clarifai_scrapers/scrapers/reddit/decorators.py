@@ -8,9 +8,9 @@ def reset_last_utc(fn):
     @wraps(fn)
     def inner(self, *args, **kwargs):
 
-        page_num = itemgetter('page_num')(kwargs)
+        page = kwargs.get('page') or 1
 
-        if page_num == 1: self.last_utc = None
+        if page == 1: self.last_utc = None
 
         return fn(self, *args, **kwargs)
     

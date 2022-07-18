@@ -38,8 +38,8 @@ class RedditSubmissions(ScraperBase):
         super().__init__()
 
         self.query = ''
+        self.page  = 1
         self.per_page  = 30
-        self.page_num  = 1
         self.last_utc  = None
 
     
@@ -104,8 +104,8 @@ class RedditSubmissions(ScraperBase):
     def search(
         self, 
         query: str, 
-        per_page: int, 
-        page_num: int,
+        page: int = 1,
+        per_page: int = 30, 
         **additional_data: dict
         ) -> dict:
         """
@@ -123,7 +123,7 @@ class RedditSubmissions(ScraperBase):
         pushshift_response = self._make_request()['data']
         results            = [self._template_search(submission) for submission in pushshift_response]
 
-        return self._response.search(results=results, additional_data=additional_data)
+        return self._response.returns(results)
     
 
     @add_all_args_to_self

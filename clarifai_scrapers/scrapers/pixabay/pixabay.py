@@ -16,7 +16,7 @@ class Pixabay(ScraperBase):
         self.api_key  = api_key
 
         self.query    = ''
-        self.page_num = 1
+        self.page     = 1
         self.per_page = 30
 
 
@@ -24,7 +24,7 @@ class Pixabay(ScraperBase):
         params = {
             'api_key': self.api_key,
             'query': self.query,
-            'page_num': self.page_num,
+            'page_num': self.page,
             'per_page': self.per_page
         }
 
@@ -57,8 +57,8 @@ class Pixabay(ScraperBase):
     def search(
         self, 
         query: str, 
-        page_num: int, 
-        per_page: int,
+        page: int = 1, 
+        per_page: int = 30,
         **additional_data: dict
         ):
         """
@@ -77,7 +77,7 @@ class Pixabay(ScraperBase):
         pixabay_results  = pixabay_response.get('hits', [])
         results          = [self._template_search(image) for image in pixabay_results]
 
-        return self._response.search(results=results, additional_data=additional_data)
+        return self._response.returns(results)
 
 
 

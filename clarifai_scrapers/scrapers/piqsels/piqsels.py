@@ -16,6 +16,8 @@ class Piqsels(ScraperBase):
     def __init__(self):
         super().__init__()
 
+        self.page     = 1
+        self.per_page = 30
 
     def _make_request(self) -> 'bs4.BeautifulSoup':
         """
@@ -24,13 +26,12 @@ class Piqsels(ScraperBase):
         Returns:
             (bs4.BeautifulSoup)
         """
-        params = {
-            'query': self.query,
-            'page_num': self.page_num
-        }
 
-        url      = self._url_handler.build(SEARCH_URL, path_variables=params)
-        response = self._http_client.make_request('get', url)
+        url      = self._url_handler.build(SEARCH_URL, query_params={
+            'q': self.query,
+            'page_num': self.page
+        })
+        response = self._http_client.make_request("GET", url)
         soup     = BeautifulSoup(response.content, 'html.parser')
 
         return soup
@@ -86,8 +87,8 @@ class Piqsels(ScraperBase):
     def search(
         self, 
         query: str, 
-        page_num: int,
-        per_page: int,
+        page: int = 1,
+        per_page: int = 30,
         **additional_data
         ):
         """
@@ -105,7 +106,7 @@ class Piqsels(ScraperBase):
         list_elements = self._get_image_grid()
         results       = [self._template_search(list_element) for list_element in list_elements[:per_page]]
             
-        return self._response.search(results=results, additional_data=additional_data)
+        return self._response.returns(results)
 
 
 
