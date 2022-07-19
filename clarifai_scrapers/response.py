@@ -32,11 +32,12 @@ class Response:
 
     def returns(self, response: dict or list) -> Wrapper:
 
-        for image_object in response:
-            if image_object['urls']['full'] is not None:
-                image_object['bytes'] = {
-                    'full': image_url_to_base64(image_object['urls']['full']),
-                    'thumb': image_url_to_base64(image_object['urls']['thumb'])
-                }
+        if self.also_return_bytes:
+            for image_object in response:
+                if image_object['urls']['full'] is not None:
+                    image_object['bytes'] = {
+                        'full': image_url_to_base64(image_object['urls']['full']),
+                        'thumb': image_url_to_base64(image_object['urls']['thumb'])
+                    }
 
         return Wrapper(response)
