@@ -1,6 +1,9 @@
 # SYSTEM IMPORTS 
 import json, inspect
 
+# UTILS
+from clarifai_scrapers.utils.images import image_url_to_base64
+
 
 class Wrapper:
 
@@ -19,9 +22,21 @@ class Wrapper:
 
 class Response:
 
-    def __init__(self):
-        pass 
+    def __init__(
+        self,
+        also_return_bytes: bool = False
+        ):
+
+        self.also_return_bytes = also_return_bytes
 
 
-    def returns(self, response: dict):
+    def returns(self, response: dict or list) -> Wrapper:
+
+        for image_object in response:
+            if image_object['urls']['full'] is not None:
+                image_object['bytes'] = {
+                    'full': image_url_to_base64(image_object['urls']['full']),
+                    'thumb': image_url_to_base64(image_object['urls']['thumb'])
+                }
+
         return Wrapper(response)

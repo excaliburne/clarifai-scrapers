@@ -2,7 +2,7 @@
 import requests, base64
 
 
-def get_as_base64(url):
+def image_url_to_base64(url: str):
     """
     Convert image url to base64 string
 
@@ -13,4 +13,5 @@ def get_as_base64(url):
         [type]: [description]
     """
     encoded = base64.b64encode(requests.get(url).content)
+
     return encoded.decode('ascii') 

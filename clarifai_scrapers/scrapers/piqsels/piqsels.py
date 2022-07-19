@@ -5,7 +5,7 @@ from clarifai_scrapers.scrapers.base import ScraperBase
 from bs4 import BeautifulSoup
 
 # UTILS
-from clarifai_scrapers.utils.decorators import add_all_args_to_self, timed
+from clarifai_scrapers.utils.decorators import add_all_args_to_self, timed, page_size_limitation_if_bytes_requested
 
 # CONSTS
 from .endpoints import SEARCH_URL
@@ -13,11 +13,14 @@ from .endpoints import SEARCH_URL
 
 class Piqsels(ScraperBase):
 
-    def __init__(self):
+    def __init__(self, also_return_bytes: bool = False):
         super().__init__()
 
         self.page     = 1
         self.per_page = 30
+
+        self.also_return_bytes = also_return_bytes
+
 
     def _make_request(self) -> 'bs4.BeautifulSoup':
         """
@@ -84,6 +87,7 @@ class Piqsels(ScraperBase):
     # TODO: Need to find a better workaround for the pagination
     @add_all_args_to_self
     @timed
+    @page_size_limitation_if_bytes_requested
     def search(
         self, 
         query: str, 

@@ -4,7 +4,7 @@
 from clarifai_scrapers.scrapers.base import ScraperBase
 
 # UTILS
-from clarifai_scrapers.utils.decorators import timed, paginate, add_all_args_to_self
+from clarifai_scrapers.utils.decorators import timed, paginate, add_all_args_to_self, page_size_limitation_if_bytes_requested
 from clarifai_scrapers.scrapers.reddit.decorators import reset_last_utc
 from clarifai_scrapers.utils import csvs
 
@@ -20,10 +20,10 @@ class Reddit(ScraperBase):
         ScraperBase (Class)
     """
 
-    def __init__(self):
+    def __init__(self, also_return_bytes: bool = False):
         super().__init__()
 
-        self.submissions = RedditSubmissions()
+        self.submissions = RedditSubmissions(also_return_bytes)
     
     
 class RedditSubmissions(ScraperBase):
@@ -34,13 +34,15 @@ class RedditSubmissions(ScraperBase):
         ScraperBase (Class): Inherits from
     """
 
-    def __init__(self):
+    def __init__(self, also_return_bytes: bool = False):
         super().__init__()
 
         self.query = ''
         self.page  = 1
         self.per_page  = 30
         self.last_utc  = None
+
+        self.also_return_bytes = also_return_bytes
 
     
     def __call__(self):
@@ -101,6 +103,7 @@ class RedditSubmissions(ScraperBase):
     @add_all_args_to_self
     @timed
     @reset_last_utc
+    @page_size_limitation_if_bytes_requested
     def search(
         self, 
         query: str, 

@@ -1,8 +1,8 @@
-# UTILS
-from clarifai_scrapers.utils.decorators import timed, add_all_args_to_self
-
 # MODULES
 from clarifai_scrapers.scrapers.base import ScraperBase
+
+# UTILS
+from clarifai_scrapers.utils.decorators import timed, add_all_args_to_self, page_size_limitation_if_bytes_requested
 
 # CONSTS
 from .endpoints import SEARCH_IMAGES_URL
@@ -10,7 +10,11 @@ from .endpoints import SEARCH_IMAGES_URL
 
 class Pixabay(ScraperBase):
 
-    def __init__(self, api_key: str):
+    def __init__(
+        self, 
+        api_key: str, 
+        also_return_bytes: bool = False
+        ):
         super().__init__()
 
         self.api_key  = api_key
@@ -18,6 +22,8 @@ class Pixabay(ScraperBase):
         self.query    = ''
         self.page     = 1
         self.per_page = 30
+
+        self.also_return_bytes = also_return_bytes
 
 
     def _make_request(self):
@@ -54,6 +60,7 @@ class Pixabay(ScraperBase):
     
     @add_all_args_to_self
     @timed
+    @page_size_limitation_if_bytes_requested
     def search(
         self, 
         query: str, 

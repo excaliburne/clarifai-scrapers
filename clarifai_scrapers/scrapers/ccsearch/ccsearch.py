@@ -9,7 +9,7 @@ from clarifai_scrapers.scrapers.base import ScraperBase
 from clarifai_scrapers.errors import FailedAuthentication, AuthenticationRequired
 
 # UTILS
-from clarifai_scrapers.utils.decorators import add_all_args_to_self, timed
+from clarifai_scrapers.utils.decorators import add_all_args_to_self, timed, page_size_limitation_if_bytes_requested
 from clarifai_scrapers.utils.http       import call_curl
 
 # CONSTS
@@ -22,12 +22,17 @@ def current_time():
 
 class CCsearch(ScraperBase):
 
-	def __init__(self, auth_object: dict = None):
+	def __init__(
+		self, 
+		auth_object: dict = None,
+		also_return_bytes: bool = False
+		):
 		"""
 
 		Args:
 			auth_object (dict, optional): Necessary if you want to request from than 30 images per page
 				{'client_id': '', 'client_secret': ''}
+			also_return_bytes (bool): Defaults to False.
 		"""
 		super().__init__()
 
@@ -35,6 +40,8 @@ class CCsearch(ScraperBase):
 		self.query        = ''
 		self.page         = 1
 		self.per_page     = 20
+
+		self.also_return_bytes = also_return_bytes
 
 		self.auth_object  = auth_object
 		
@@ -134,6 +141,7 @@ class CCsearch(ScraperBase):
 
 	@timed
 	@add_all_args_to_self
+	@page_size_limitation_if_bytes_requested
 	def search(
 		self, 
 		query: str, 

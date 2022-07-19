@@ -1,19 +1,27 @@
 # MODULES
-from clarifai_scrapers import response
 from clarifai_scrapers.scrapers.base import ScraperBase
 
 # 
 from clarifai_scrapers.response import Response
+
+# UTILS
+from clarifai_scrapers.utils.decorators import page_size_limitation_if_bytes_requested
 
 # CONSTS
 from .endpoints import LIST_PHOTOS, SEARCH_PHOTOS
 
 
 class Unsplash(ScraperBase):
-    def __init__(self, api_key: str):
+    def __init__(
+        self, 
+        api_key: str,
+        also_return_bytes: bool = False
+        ):
         super().__init__()
 
-        self.api_key  = api_key
+        self.api_key = api_key
+
+        self.also_return_bytes = also_return_bytes
         
 
     def _make_request(
@@ -56,7 +64,7 @@ class Unsplash(ScraperBase):
         page: int = None,
         per_page: int = None,
         order_by: str = None
-    ):
+    ) -> str or list:
         """
         List Photos
 
@@ -87,6 +95,7 @@ class Unsplash(ScraperBase):
         return Response().returns(response_schema)
     
 
+    @page_size_limitation_if_bytes_requested
     def search_photos(
         self,
         query: str,

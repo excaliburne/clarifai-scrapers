@@ -1,8 +1,11 @@
-# SYSTEM
+# SYSTEM IMPORTS
 from functools import wraps
 from time import perf_counter
 from itertools import islice
 from typing import Generator
+
+# errors
+from clarifai_scrapers.errors import PageSizeLimitExceeded
 
 
 def timed(fn):
@@ -75,6 +78,23 @@ def add_all_args_to_self(fn):
 
         for param in kwargs.items():
             if param[0] != 'self': setattr(self, param[0], param[1])  
+
+        return fn(self, *args, **kwargs)
+    
+    return inner
+
+
+
+def page_size_limitation_if_bytes_requested(fn):
+
+    @wraps(fn)
+    def inner(self, *args, **kwargs):
+
+        bool_user_requested_bytes_to_be_returned = self.also_return_bytes
+        per_page = kwargs.get('per_page')
+
+        if per_page > 30 and bool_user_requested_bytes_to_be_returned:
+            raise PageSizeLimitExceeded('Bytes can only be returned when page size is <= 30')
 
         return fn(self, *args, **kwargs)
     
