@@ -4,6 +4,9 @@ from clarifai_scrapers.scrapers.base import ScraperBase
 # UTILS
 from clarifai_scrapers.utils.decorators import page_size_limitation_if_bytes_requested
 
+# ERRORS
+from clarifai_scrapers.errors import FailedAuthentication
+
 # CONSTS
 from .endpoints import SEARCH_PHOTOS
 
@@ -90,7 +93,12 @@ class Flickr(ScraperBase):
             }
         )
 
-        response_schema = [self._to_response_schema(image_object) for image_object in response.json()['photos']['photo']] \
+        response_content = response.json()
+        
+        if response_content.get('message') == 'Invalid API Key (Key not found)':
+            raise FailedAuthentication('Flickr', response_content['message'])
+
+        response_schema = [self._to_response_schema(image_object) for image_object in response_content['photos']['photo']] \
             if response.status_code == 200 else []
 
         return self._response.returns(response_schema)

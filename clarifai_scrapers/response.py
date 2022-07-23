@@ -16,8 +16,8 @@ class Wrapper:
         return self.response
 
 
-    def to_json(self, pretty_print: bool = False) -> json:
-        return json.dumps(self.response, **{'indent': 2} if pretty_print else {})
+    def to_json(self) -> json:
+        return json.dumps(self.response, indent=2)
 
 
 class Response:
